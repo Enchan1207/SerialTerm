@@ -11,4 +11,4 @@ C Serial connection example for Linux.
 ## Licence
 
 All files in this repository is published under the MIT Licence.  
-In details, show [LICENCE](LICENCE).  
+In details, show [LICENSE](LICENSE).  
