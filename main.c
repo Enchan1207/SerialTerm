@@ -11,12 +11,21 @@
 #include <fcntl.h>
 #include <termios.h>
 #include <unistd.h>
+#include <signal.h>
 
 // functions
 int openSetialPort(unsigned int baudRate, char *portPath, struct termios tio);
 int closeSerialPort(int serialPort);
 int discover(char *available[], int buflen, int bufCount);
 void replaceBlank(char *str);
+
+int port; // シリアルポート
+bool endReq = false;
+
+// シグナルハンドラ
+void signalHandler(int signo){
+    endReq = true; // ほんとはしっかりシグナル番号見るべき
+}
 
 int main(int argc, char *argv[]){
 
@@ -49,33 +58,29 @@ int main(int argc, char *argv[]){
     }
     portPath = available[choice];
 
-    int port; // シリアルポート
     int baudRate = B115200; // 通信速度
     struct termios tio; // シリアル通信のコンフィグを管理する構造体
 
-    printf("Opening Serial port %s...\n", portPath);
+    printf("Opening Serial port \033[36m%s\033[0m ...\n", portPath);
     port = openSetialPort(baudRate, portPath, tio);
     if(port == -1){
         printf("\n\033[31mERROR\033[0m couldn't establish connection to serial port %s.\n", portPath);
         return -1;
     }
-    printf("\033[32mSUCCESS\033[0m connection has been established.\n");
+    printf("[\033[32mSUCCESS\033[0m] connection has been established.\n");
 
-    // 送受信処理ループ
-    char buf[255];
-    while (1){
-        int len = read(port, buf, sizeof(buf));
-        if(len > 0){
-            for(int i = 0; i < len; i++){
-                printf("%c", buf[i]);
-            }
-            printf("\n");
-        }
+    // SIGINTを受け取る
+    if(signal(SIGINT, signalHandler) == SIG_ERR){
+        printf("STOP ERROR!\n");
+    }
 
-        write(port, buf, len);
+    // ターミナル
+    while (!endReq){
+
     }
 
     // ポートを閉じる
+    printf("\nClosing Serial port...\n");
     closeSerialPort(port);
     return 0;
 }
@@ -98,7 +103,7 @@ int openSetialPort(unsigned int baudRate, char *portPath, struct termios tio){
     tio.c_cflag |= 0;      // パリティビット PARENB
 
     // I/Oのボーレートを設定
-    printf("Apply settings\n");
+    printf("Apply...\n");
     cfsetispeed(&tio, baudRate);
     cfsetospeed(&tio, baudRate);
 

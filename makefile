@@ -1,5 +1,5 @@
 # variables
-includePath = -g -O0 -I ./
+includePath = -I ./ -lncurses 
 
 # recipe
 
