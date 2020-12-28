@@ -2,6 +2,9 @@
  * Cでシリアル通信
 */
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
@@ -9,44 +12,29 @@
 #include <termios.h>
 #include <unistd.h>
 
-#define SERIAL_PORT "/dev/cu.usbserial-DO4VYIOW"
+// functions
+int openSetialPort(unsigned int baudRate, char *portPath, struct termios tio);
+int closeSerialPort(int serialPort);
 
 int main(int argc, char *argv[]){
 
-    int fd;
-    struct termios tio; // シリアル通信のコンフィグを管理する構造体
+    int port; // シリアルポート
+    char *portPath = "/dev/cu.usbserial-DO4VYIOW"; // ポートの場所
     int baudRate = B115200; // 通信速度
+    struct termios tio; // シリアル通信のコンフィグを管理する構造体
 
-    // ポートを開く
-    printf("Opening Serial port...\n");
-    fd = open(SERIAL_PORT, O_RDWR);
-    if (fd < 0) {
-        printf("\033[31mERROR\033[0m: couldn't establish serial-port connection.\n");
+    printf("Opening Serial port... ");
+    port = openSetialPort(baudRate, portPath, tio);
+    if(port == -1){
+        printf("\n\033[31mERROR\033[0m couldn't establish connection to serial port %s.\n", portPath);
         return -1;
     }
-    printf("\033[32mSUCCESS\033[0m: open serial port\n");
-
-    tio.c_cflag += CREAD; // 受信
-    tio.c_cflag += CLOCAL; // RTS/CTS制御はしない
-
-    // 8N1
-    tio.c_cflag += CS8; //8bit
-    tio.c_cflag += 0; // 1 stop bit
-    tio.c_cflag += 0; // non parity
-
-    // I/Oのボーレートを設定
-    cfsetispeed( &tio, baudRate );
-    cfsetospeed( &tio, baudRate );
-
-    cfmakeraw(&tio);                    // RAWモード
-    tcsetattr( fd, TCSANOW, &tio );     // デバイスに設定を行う
-
-    printf("Serial port configured\n");
+    printf("\033[32mSUCCESS\033[0m.\n");
 
     // 送受信処理ループ
     char buf[255];
     while(1) {
-        int len = read(fd, buf, sizeof(buf));
+        int len = read(port, buf, sizeof(buf));
         if (len > 0) {
             for(int i = 0; i < len; i++) {
                 printf("%c", buf[i]);
@@ -54,10 +42,40 @@ int main(int argc, char *argv[]){
             printf("\n");
         }
 
-        write(fd, buf, len);
+        write(port, buf, len);
     }
 
     // ポートを閉じる
-    close(fd);
+    closeSerialPort(port);
     return 0;
+}
+
+// ボーレートとポート名、termios構造体を渡してシリアルポートを開く
+int openSetialPort(unsigned int baudRate, char *portPath, struct termios tio){
+    // ポートを開く
+    int fd = open(portPath, O_RDWR);
+    if (fd < 0) {
+        return -1;
+    }
+
+    // 制御設定
+    tio.c_cflag |= CREAD; // 受信を有効化
+    tio.c_cflag |= CLOCAL; // フロー制御(RTS, CTS, DTRなど)を無視
+    tio.c_cflag |= CS8; // データ長 CS5 CS6 CS7
+    tio.c_cflag |= 0; // ストップビット CSTOPB
+    tio.c_cflag |= 0; // パリティビット PARENB
+
+    // I/Oのボーレートを設定
+    cfsetispeed(&tio, baudRate);
+    cfsetospeed(&tio, baudRate);
+
+    cfmakeraw(&tio); // 受け取ったデータに特殊処理を施さず、全てそのまま出力する
+    tcsetattr(fd, TCSANOW, &tio); // 設定を反映
+
+    return fd;
+}
+
+// シリアルポートを閉じる
+int closeSerialPort(int serialPort){
+    return close(serialPort);
 }
