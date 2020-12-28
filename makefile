@@ -1,5 +1,5 @@
 # variables
-includePath = -I ./
+includePath = -g -O0 -I ./
 
 # recipe
 
