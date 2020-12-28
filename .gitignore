@@ -2,3 +2,6 @@
 *.out
 *.o
 *.dll
+*.dSYM
+.vscode
+main
