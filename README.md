@@ -8,7 +8,7 @@ Simple UART Terminal Software for Linux (MacOS Compatible).
 
 ### Auto connection
 
-**[Automatic connection](issues/3)** has been implemented!  
+**[Automatic connection](https://github.com/Enchan1207/SerialTerm/issues/3)** has been implemented!  
 When executed, It'll try to establish connection based on the previous configuration.
 
 ### Port selection commands
