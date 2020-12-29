@@ -6,34 +6,9 @@ Simple UART Terminal Software for Linux (MacOS Compatible).
 
 ## Latest Updates
 
-### Auto connection
+### Ignore auto connection
 
-**[Automatic connection](https://github.com/Enchan1207/SerialTerm/issues/3)** has been implemented!  
-When executed, It'll try to establish connection based on the previous configuration.
-
-### Port selection commands
-
-You can use the command `r`(**R**etry), `q`(**Q**uit) in the port selector! 
-Example:   
-
-    Opening Serial port /dev/cu.usbserial-XXXXXXXX ...
-    Open port
-
-    ERROR couldn't establish connection to serial port /dev/cu.usbserial-XXXXXXXX.
-    Discovering serial ports...
-    [0] /dev/cu.Bluetooth-Incoming-Port
-    [1] /dev/cu.XX-XXXXX-serialport
-    r (you typed)
-    Retrying...
-    Opening Serial port /dev/cu.usbserial-XXXXXXXX ...
-    Open port
-
-    ERROR couldn't establish connection to serial port /dev/cu.usbserial-XXXXXXXX.
-    Discovering serial ports...
-    [0] /dev/cu.Bluetooth-Incoming-Port
-    [1] /dev/cu.XX-XXXXX-serialport
-    q (you typed)
-    Terminated.
+You can ignore the automatic connection by specifying `n` as the first argument.  
 
 ## Usage
 
@@ -47,6 +22,7 @@ Example:
 ### Connect to serial ports
 
 Running `serterm`, it will automatically scan for valid serial ports and display them in the list.  
+If you have connected to any serial port, it will be connected automatically.  
 
     ~ $ ./serterm
     Discovering serial ports...
@@ -60,6 +36,8 @@ Enter the number of the port you want to use and it will try to open that port.
     Open port
     Condigure settings
     Apply...
+
+Or you can type `r`(means **R**etry) or `q`(means **Q**uit). 
 
 If serial-port connection could be established sucessfully, this message is showed.
 
