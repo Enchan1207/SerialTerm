@@ -5,17 +5,17 @@
 #include <stdbool.h>
 #include <signal.h>
 #include <unistd.h>
+#include <pthread.h>
 
 #include "client.h"
 
 int port; // シリアルポート
-bool endreq = false, *endReq;
+bool endreq = false, *endReq = &endreq;
 
 void selectPorts(int buflen, int bufCount, char *portPath);
 
 // シグナルハンドラ
 void signalHandler(int signo){
-    printf("SIGINT!!\n");
     *endReq = true; // ほんとはしっかりシグナル番号見るべき
 }
 
@@ -44,17 +44,18 @@ int main(int argc, char *argv[]){
     // SIGINTを受け取る
     signal(SIGINT, signalHandler);
 
-    // 受信ループ
-    endReq = &endreq;
-    char buf[512];
-    memset(buf, '\0', 512);
+    // 受信スレッドを立てる
+    SerialConf conf;
+    conf.port = &port;
+    conf.endReq = endReq;
+
+    pthread_t rcvThread;
+    pthread_create(&rcvThread, NULL, recvThread, &conf);
+
+
+    // 
     while (!(*endReq)){
-        int len = read(port, buf, sizeof(buf));
-        if(len > 0){
-            for(int i = 0; i < len; i++){
-                printf("%c", buf[i]);
-            }
-        }
+        /* code */
     }
 
     // ポートを閉じる
