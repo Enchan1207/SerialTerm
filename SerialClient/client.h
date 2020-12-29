@@ -8,6 +8,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <stdbool.h>
 
 /* -------- */
 #include <sys/types.h>
@@ -17,9 +20,20 @@
 #include <termios.h>
 
 /* -------- */
+
+typedef struct serialconf{
+    int* port;
+    bool* endReq;
+} SerialConf;
+
+/* -------- */
 int openSetialPort(unsigned int baudRate, char *portPath, struct termios tio);
 int closeSerialPort(int serialPort);
 int discover(char *available[], int buflen, int bufCount);
 void replaceBlank(char *str);
+void selectPorts(int buflen, int bufCount, char *portPath);
+
+/* -------- */
+void *recvThread(void *_conf);
 
 #endif
