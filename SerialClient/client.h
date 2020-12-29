@@ -20,7 +20,10 @@
 #include <termios.h>
 
 /* -------- */
+#define REQUIRE_EXIT 1
+#define REQUIRE_RETRY 2
 
+/* -------- */
 typedef struct serialconf{
     int* port;
     bool* endReq;
@@ -31,7 +34,7 @@ int openSetialPort(unsigned int baudRate, char *portPath, struct termios tio);
 int closeSerialPort(int serialPort);
 int discover(char *available[], int buflen, int bufCount);
 void replaceBlank(char *str);
-void selectPorts(int buflen, int bufCount, char *portPath);
+int selectPorts(int buflen, int bufCount, char *portPath);
 
 /* -------- */
 void *recvThread(void *_conf);
