@@ -109,10 +109,10 @@ int selectPorts(int buflen, int bufCount, char *portPath){
         // どれでもなければスキャン結果の選択とみなし、数値に変換
         choice = atoi(buffer);
         if(choice < 0 || choice >= portsCount){
-            result = 0;
             continue;
         }
         memcpy(portPath, available[choice], buflen);
+        result = 0;
     }
 
     // ポートを選択していたら割り当てる
