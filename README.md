@@ -1,4 +1,4 @@
-# CSerialEx
+# SerialTerm
 
 ## Overview
 
@@ -15,9 +15,9 @@ Simple UART Terminal Software for Linux (MacOS Compatible).
 
 ### Connect to serial ports
 
-Running serterm, it will automatically scan for valid serial ports and display them in the list.  
+Running `serterm`, it will automatically scan for valid serial ports and display them in the list.  
 
-    ~ $ ./main
+    ~ $ ./serterm
     Discovering serial ports...
     [0] /dev/cu.Bluetooth-Incoming-Port
     [1] /dev/cu.usbserial-XXXXXXXX
