@@ -6,7 +6,7 @@ destination = /usr/local/bin# 実行ファイルの配置場所
 
 # 実行ファイル生成
 $(product): main.c SerialClient.dll
-	gcc $(includePath) SerialClient.dll main.c -o main
+	gcc $(includePath) SerialClient.dll main.c -o $(product)
 
 SerialClient.dll: SerialClient/client.h SerialClient/client.c SerialClient/recvThread.c
 	gcc $(includePath) -c SerialClient/client.c

@@ -4,4 +4,4 @@
 *.dll
 *.dSYM
 .vscode
-main
+serterm
