@@ -60,6 +60,7 @@ int main(int argc, char *argv[]){
                 break;
             }
             if(result == REQUIRE_RETRY){
+                printf("Retrying...\n");
                 continue;
             }
         }

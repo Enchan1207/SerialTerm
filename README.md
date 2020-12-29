@@ -4,6 +4,37 @@
 
 Simple UART Terminal Software for Linux (MacOS Compatible).  
 
+## Latest Updates
+
+### Auto connection
+
+**[Automatic connection](issues/3)** has been implemented!  
+When executed, It'll try to establish connection based on the previous configuration.
+
+### Port selection commands
+
+You can use the command `r`(**R**etry), `q`(**Q**uit) in the port selector! 
+Example:   
+
+    Opening Serial port /dev/cu.usbserial-XXXXXXXX ...
+    Open port
+
+    ERROR couldn't establish connection to serial port /dev/cu.usbserial-XXXXXXXX.
+    Discovering serial ports...
+    [0] /dev/cu.Bluetooth-Incoming-Port
+    [1] /dev/cu.XX-XXXXX-serialport
+    r (you typed)
+    Retrying...
+    Opening Serial port /dev/cu.usbserial-XXXXXXXX ...
+    Open port
+
+    ERROR couldn't establish connection to serial port /dev/cu.usbserial-XXXXXXXX.
+    Discovering serial ports...
+    [0] /dev/cu.Bluetooth-Incoming-Port
+    [1] /dev/cu.XX-XXXXX-serialport
+    q (you typed)
+    Terminated.
+
 ## Usage
 
 ### Installation
