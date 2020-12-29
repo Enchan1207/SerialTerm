@@ -1,5 +1,5 @@
 # variables
-includePath = -I ./ -I SerialClient/
+includePath = -I ./ -I SerialClient/ -pthread
 
 # recipe
 

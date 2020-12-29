@@ -58,6 +58,35 @@ int discover(char *available[], int buflen, int bufCount){
     return availableCount - 1;
 }
 
+// デバイスを探索し、選択UIを表示 結果をchar*で返す
+void selectPorts(int buflen, int bufCount, char *portPath){
+    char *available[buflen];
+    for (int i = 0; i < 10; i++){
+        available[i] = (char *)calloc(sizeof(char), buflen);
+    }
+
+    // ポート探索!
+    printf("Discovering serial ports...\n");
+    int portsCount = discover(available, buflen, bufCount);
+    for(int i = 0; i < portsCount; i++){
+        printf("[%d] ", i);
+        char tmp = ' ';
+        int idx = 0;
+        printf("%s\n", available[i]);
+    }
+
+    // 結果を選択させて
+    int choice = -1;
+    while(choice < 0 || choice >= portsCount){
+        printf("Which port do you use? ");
+        scanf("%1d", &choice); // YOU SHOULDN'T USE SCANF
+    }
+    memcpy(portPath, available[choice], buflen);
+
+    // 戻す
+    portPath = available[choice];
+}
+
 // 改行を\0に置き換える
 void replaceBlank(char *str){
     char *tmp = str;

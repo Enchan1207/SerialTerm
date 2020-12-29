@@ -2,7 +2,6 @@
  * Cでシリアル通信
 */
 #include <stdio.h>
-#include <stdlib.h>
 #include <stdbool.h>
 #include <signal.h>
 
@@ -10,6 +9,8 @@
 
 int port; // シリアルポート
 bool endReq = false;
+
+void selectPorts(int buflen, int bufCount, char *portPath);
 
 // シグナルハンドラ
 void signalHandler(int signo){
@@ -25,6 +26,8 @@ int main(int argc, char *argv[]){
     if(portPath == NULL){
         return EXIT_FAILURE;
     }
+
+    /*
     char *available[buflen];
     for (int i = 0; i < 10; i++){
         available[i] = (char *)calloc(sizeof(char), buflen);
@@ -47,6 +50,9 @@ int main(int argc, char *argv[]){
         scanf("%d", &choice); // YOU SHOULDN'T USE SCANF
     }
     portPath = available[choice];
+    */
+
+    selectPorts(buflen, bufCount, portPath);
 
     int baudRate = B115200; // 通信速度
     struct termios tio; // シリアル通信のコンフィグを管理する構造体

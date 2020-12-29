@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 /* -------- */
 #include <sys/types.h>
@@ -21,5 +22,6 @@ int openSetialPort(unsigned int baudRate, char *portPath, struct termios tio);
 int closeSerialPort(int serialPort);
 int discover(char *available[], int buflen, int bufCount);
 void replaceBlank(char *str);
+void selectPorts(int buflen, int bufCount, char *portPath);
 
 #endif
