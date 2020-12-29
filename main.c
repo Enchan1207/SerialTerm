@@ -20,6 +20,14 @@ void signalHandler(int signo){
 }
 
 int main(int argc, char *argv[]){
+    bool ignoreAutoConnect = false;
+    // 実行引数をパース
+    if(argc > 1){
+        if(argv[1][0] == 'n'){
+            ignoreAutoConnect = true;
+        }
+    }
+
     int buflen = 50, bufCount = 10;
     char *portPath;
     portPath = (char *)calloc(sizeof(char), buflen);
@@ -27,13 +35,13 @@ int main(int argc, char *argv[]){
         return EXIT_FAILURE;
     }
 
-    // 前回の構成が存在すればそれを開く
+    // 前回の構成が存在し、オプションで指定されていなければそれを開く
     char *prePortPath;
     prePortPath = (char *)calloc(sizeof(char), buflen);
     if(prePortPath == NULL){
         return EXIT_FAILURE;
     }
-    if(loadPortPath(prePortPath, buflen) == 0){
+    if(loadPortPath(prePortPath, buflen) == 0 && ignoreAutoConnect == false){
         printf("Previous configuration has found. try to establish connection to it.\n");
         memcpy(portPath, prePortPath, buflen);
     }else{
