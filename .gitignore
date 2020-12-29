@@ -5,3 +5,4 @@
 *.dSYM
 .vscode
 serterm
+*.a
