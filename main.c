@@ -14,6 +14,8 @@ int port; // シリアルポート
 bool endreq = false, *endReq = &endreq;
 
 void selectPorts(int buflen, int bufCount, char *portPath);
+void savePortPath(char *portPath);
+int loadPortPath(char *portPath, unsigned char buflen);
 
 // シグナルハンドラ
 void signalHandler(int signo){
@@ -21,15 +23,28 @@ void signalHandler(int signo){
 }
 
 int main(int argc, char *argv[]){
-
-    // ポートを選択して
     int buflen = 50, bufCount = 10;
     char *portPath;
     portPath = (char *)calloc(sizeof(char), buflen);
     if(portPath == NULL){
         return EXIT_FAILURE;
     }
-    selectPorts(buflen, bufCount, portPath);
+
+    // 前回の構成が存在すればそれを開く
+    char *prePortPath;
+    prePortPath = (char *)calloc(sizeof(char), buflen);
+    if(prePortPath == NULL){
+        return EXIT_FAILURE;
+    }
+    if(loadPortPath(prePortPath, buflen) == 0){
+        memcpy(portPath, prePortPath, buflen);
+    }else{
+        // なければポートを選択
+        selectPorts(buflen, bufCount, portPath);
+    }
+
+    // 開いたポートのパスを/tmp以下に保存しておく
+    savePortPath(portPath);
 
     // 開く
     int baudRate = B115200; // 通信速度
@@ -76,3 +91,40 @@ int main(int argc, char *argv[]){
     closeSerialPort(port);
     return 0;
 }
+
+// ポートパスを読み込む
+int loadPortPath(char *portPath, unsigned char buflen){
+    // ファイル開いて
+    FILE *fp;
+    fp = fopen("/tmp/serterm/portPath", "r");
+    if(fp == NULL){
+        return errno;
+    }
+
+    // パス読んで
+    fread(portPath, sizeof(char), buflen, fp);
+
+    // 閉じる!
+    fclose(fp);
+
+    return 0;
+}
+
+// ポートパスを保存
+void savePortPath(char *portPath){
+    // ファイル開いて
+    FILE *fp;
+    system("mkdir -p /tmp/serterm/ > /dev/null");
+    fp = fopen("/tmp/serterm/portPath", "w");
+    if(fp == NULL){
+        printf("File open error: %d\n", errno);
+        return;
+    }
+
+    // パス書いて
+    fwrite(portPath, sizeof(char), strlen(portPath), fp);
+
+    // 保存!
+    fclose(fp);
+}
+
