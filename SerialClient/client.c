@@ -7,7 +7,7 @@
 int openSetialPort(unsigned int baudRate, char *portPath, struct termios tio){
     // ポートを開く
     printf("Open port\n");
-    int fd = open(portPath, O_RDWR);
+    int fd = open(portPath, O_NONBLOCK);
     if(fd < 0){
         return -1;
     }
@@ -19,6 +19,9 @@ int openSetialPort(unsigned int baudRate, char *portPath, struct termios tio){
     tio.c_cflag |= CS8;    // データ長 CS5 CS6 CS7
     tio.c_cflag |= 0;      // ストップビット CSTOPB
     tio.c_cflag |= 0;      // パリティビット PARENB
+    tio.c_lflag &= ~(ICANON); // カノニカルモード無効化
+    tio.c_cc[VMIN] = 0;
+    tio.c_cc[VTIME] = 0;
 
     // I/Oのボーレートを設定
     printf("Apply...\n");
