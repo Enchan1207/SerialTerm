@@ -62,7 +62,7 @@ int discover(char *available[], int buflen, int bufCount){
 }
 
 // デバイスを探索し、選択UIを表示 結果をchar*で返す
-void selectPorts(int buflen, int bufCount, char *portPath){
+int selectPorts(int buflen, int bufCount, char *portPath){
     char *available[buflen];
     for (int i = 0; i < 10; i++){
         available[i] = (char *)calloc(sizeof(char), buflen);
@@ -78,16 +78,49 @@ void selectPorts(int buflen, int bufCount, char *portPath){
         printf("%s\n", available[i]);
     }
 
-    // 結果を選択させて
-    int choice = -1;
-    while(choice < 0 || choice >= portsCount){
-        printf("Which port do you use? ");
-        scanf("%1d", &choice); // YOU SHOULDN'T USE SCANF
-    }
-    memcpy(portPath, available[choice], buflen);
+    // いくつかのコマンドを受け付ける
+    /*
+     - (数値): スキャン結果の中から選択して開く
+     - q: ポート選択UIの終了を要求
+     - r: 再スキャンを要求
+    */
 
-    // 戻す
-    portPath = available[choice];
+    int commBuflen = 5;
+    char buffer[commBuflen];
+    size_t length;
+    memset(buffer, '\0', commBuflen);
+
+    // 入力を読んで
+    int result = -1, choice = 0;
+    while (result == -1){
+        while(fgets(buffer, commBuflen, stdin) == NULL || buffer[0] == '\n');
+        length = strlen(buffer);
+
+        // コマンドかチェックして
+        if(buffer[0] == 'q' || buffer[0] == 'Q'){
+            result = REQUIRE_EXIT;
+            continue;
+        }
+        if(buffer[0] == 'r' || buffer[0] == 'r'){
+            result = REQUIRE_RETRY;
+            continue;
+        }
+
+        // どれでもなければスキャン結果の選択とみなし、数値に変換
+        choice = atoi(buffer);
+        if(choice < 0 || choice >= portsCount){
+            result = 0;
+            continue;
+        }
+        memcpy(portPath, available[choice], buflen);
+    }
+
+    // ポートを選択していたら割り当てる
+    if(result == 0){
+        portPath = available[choice];
+    }
+
+    return result;
 }
 
 // 改行を\0に置き換える
