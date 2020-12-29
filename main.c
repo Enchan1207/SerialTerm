@@ -6,6 +6,7 @@
 #include <signal.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <errno.h>
 
 #include "client.h"
 
@@ -52,10 +53,22 @@ int main(int argc, char *argv[]){
     pthread_t rcvThread;
     pthread_create(&rcvThread, NULL, recvThread, &conf);
 
-
-    // 
+    // ターミナル
+    char buffer[256];
+    size_t length;
+    memset(buffer, '\0', 256);
     while (!(*endReq)){
-        /* code */
+        // 入力を読んで
+        if (fgets(buffer, 256, stdin) == NULL || buffer[0] == '\n') {
+            continue;
+        }
+        length = strlen(buffer);
+
+        // シリアルに投げつける
+        if(write(port, buffer, length) < 0){
+            printf("Some error has been occured!: %d\n", errno);
+        }
+        memset(buffer, '\0', length);
     }
 
     // ポートを閉じる

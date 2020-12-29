@@ -7,7 +7,7 @@
 int openSetialPort(unsigned int baudRate, char *portPath, struct termios tio){
     // ポートを開く
     printf("Open port\n");
-    int fd = open(portPath, O_NONBLOCK);
+    int fd = open(portPath, O_RDWR | O_NONBLOCK);
     if(fd < 0){
         return -1;
     }
