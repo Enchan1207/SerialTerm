@@ -2,62 +2,73 @@
  * Cでシリアル通信
 */
 #include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/ioctl.h>
-#include <fcntl.h>
-#include <termios.h>
-#include <unistd.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <signal.h>
 
-#define SERIAL_PORT "/dev/cu.usbserial-DO4VYIOW"
+#include "client.h"
+
+int port; // シリアルポート
+bool endReq = false;
+
+// シグナルハンドラ
+void signalHandler(int signo){
+    endReq = true; // ほんとはしっかりシグナル番号見るべき
+}
 
 int main(int argc, char *argv[]){
 
-    int fd;
-    struct termios tio; // シリアル通信のコンフィグを管理する構造体
-    int baudRate = B115200; // 通信速度
+    // テキトーにバッファを初期化して
+    int buflen = 50, bufCount = 10;
+    char *portPath;
+    portPath = (char *)calloc(sizeof(char), buflen);
+    if(portPath == NULL){
+        return EXIT_FAILURE;
+    }
+    char *available[buflen];
+    for (int i = 0; i < 10; i++){
+        available[i] = (char *)calloc(sizeof(char), buflen);
+    }
 
-    // ポートを開く
-    printf("Opening Serial port...\n");
-    fd = open(SERIAL_PORT, O_RDWR);
-    if (fd < 0) {
-        printf("\033[31mERROR\033[0m: couldn't establish serial-port connection.\n");
+    // ポート探索!
+    printf("Discovering serial ports...\n");
+    int portsCount = discover(available, buflen, bufCount);
+    for(int i = 0; i < portsCount; i++){
+        printf("[%d] ", i);
+        char tmp = ' ';
+        int idx = 0;
+        printf("%s\n", available[i]);
+    }
+
+    // 結果を選択させて
+    int choice = -1;
+    while(choice < 0 || choice >= portsCount){
+        printf("Which port do you use? ");
+        scanf("%d", &choice); // YOU SHOULDN'T USE SCANF
+    }
+    portPath = available[choice];
+
+    int baudRate = B115200; // 通信速度
+    struct termios tio; // シリアル通信のコンフィグを管理する構造体
+
+    printf("Opening Serial port \033[36m%s\033[0m ...\n", portPath);
+    port = openSetialPort(baudRate, portPath, tio);
+    if(port == -1){
+        printf("\n\033[31mERROR\033[0m couldn't establish connection to serial port %s.\n", portPath);
         return -1;
     }
-    printf("\033[32mSUCCESS\033[0m: open serial port\n");
+    printf("[\033[32mSUCCESS\033[0m] connection has been established.\n");
 
-    tio.c_cflag += CREAD; // 受信
-    tio.c_cflag += CLOCAL; // RTS/CTS制御はしない
+    // SIGINTを受け取る
+    signal(SIGINT, signalHandler);
 
-    // 8N1
-    tio.c_cflag += CS8; //8bit
-    tio.c_cflag += 0; // 1 stop bit
-    tio.c_cflag += 0; // non parity
+    // ターミナル
+    while (!endReq){
 
-    // I/Oのボーレートを設定
-    cfsetispeed( &tio, baudRate );
-    cfsetospeed( &tio, baudRate );
-
-    cfmakeraw(&tio);                    // RAWモード
-    tcsetattr( fd, TCSANOW, &tio );     // デバイスに設定を行う
-
-    printf("Serial port configured\n");
-
-    // 送受信処理ループ
-    char buf[255];
-    while(1) {
-        int len = read(fd, buf, sizeof(buf));
-        if (len > 0) {
-            for(int i = 0; i < len; i++) {
-                printf("%c", buf[i]);
-            }
-            printf("\n");
-        }
-
-        write(fd, buf, len);
     }
 
     // ポートを閉じる
-    close(fd);
+    printf("\nClosing Serial port...\n");
+    closeSerialPort(port);
     return 0;
 }
