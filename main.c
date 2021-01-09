@@ -50,7 +50,7 @@ int main(int argc, char *argv[]){
     }
 
     // 選択したポートを開く
-    int baudRate = B115200; // 通信速度
+    int baudRate = B9600; // 通信速度
     struct termios tio; // シリアル通信のコンフィグを管理する構造体
     int result = -1;
     while (port < 0){
